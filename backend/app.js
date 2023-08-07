@@ -1,39 +1,44 @@
-// app.js
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
 dotenv.config();
-// Import route files
-const usersRouter = require("./routes/users");
-const lockersRouter = require("./routes/lockers");
-const bookingsRouter = require("./routes/bookings");
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+// Import routes
+const userRoutes = require("./routes/user.routes");
+const lockerRoutes = require("./routes/locker.routes");
+const bookingRoutes = require("./routes/booking.routes");
+const dashboardRoutes = require("./routes/dashboard.routes");
 
 const app = express();
-const PORT = process.env.PORT || 4000;
 
-// Middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// Middlewares for parsing request bodies and enabling CORS
 app.use(cors());
+app.use(bodyParser.json());
+
+// Use routes
+app.use("/api/users", userRoutes);
+app.use("/api/lockers", lockerRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI, {
+  .connect(process.env.DB_CONNECTION, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => console.log("Connected to MongoDB"))
-  .catch((error) => console.error("Error connecting to MongoDB:", error));
+  .catch((error) => console.error("Could not connect to MongoDB", error));
 
-// Use the imported routes
-app.use("/", usersRouter);
-app.use("/lockers", lockersRouter);
-app.use("/bookings", bookingsRouter);
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Error handling middleware
+app.use(function (err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
 });
+
+// Start server
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Server running on port ${port}`));
