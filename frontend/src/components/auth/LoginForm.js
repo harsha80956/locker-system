@@ -32,7 +32,7 @@ const Login = () => {
       const token = response.data.token;
       // Store the token in local storage or session storage
       localStorage.setItem("token", token);
-
+      localStorage.setItem("role", response.data.role);
       // Redirect to the appropriate route based on user role (e.g., admin or user)
       if (response.data.role === "admin") {
         navigate("/admin/dashboard");

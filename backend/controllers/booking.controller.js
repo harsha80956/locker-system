@@ -5,18 +5,18 @@ const QRCode = require("qrcode");
 exports.createBooking = async (req, res) => {
   const { lockerId, bookingDate, startTime, endTime } = req.body;
   const userId = req.userId; // From the token
-
+  console.log(userId, lockerId, bookingDate, startTime, endTime);
   try {
     const locker = await Locker.findOne({ lockerId });
 
     if (locker.status !== "available") {
       return res.status(400).json({ message: "Locker is not available." });
     }
-
+    console.log("dddd");
     const qrCode = await QRCode.toDataURL(
       `${lockerId}:${startTime}:${endTime}`
     );
-
+    console.log("dddd");
     const booking = new Booking({
       user: userId,
       locker: locker._id,

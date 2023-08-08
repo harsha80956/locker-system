@@ -36,3 +36,27 @@
     transform: rotate(360deg);
   }
 }
+.payment-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.payment-page-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.selected-locker-text {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.payment-buttons-container {
+  display: flex;
+}
+
+.payment-button {
+  margin: 10px;
+}

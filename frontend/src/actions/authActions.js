@@ -22,7 +22,7 @@ const setAuthToken = (token) => {
 // Load User from token
 // Action to load the logged-in user
 export const loadUser = () => async (dispatch) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   try {
     // Get the token from localStorage
     const token = localStorage.getItem("token");
@@ -37,12 +37,12 @@ export const loadUser = () => async (dispatch) => {
 
       // Make a GET request to the backend API to fetch the user details
       const response = await axiosInstance.get("auth/user/me");
-      navigate("/user/lockers");
-      // Dispatch the SET_CURRENT_USER action with the user data
       dispatch({
         type: USER_LOADED,
         payload: response.data,
       });
+      navigate("/user/lockers");
+      // Dispatch the SET_CURRENT_USER action with the user data
     }
   } catch (err) {
     // If there's an error, dispatch the AUTH_ERROR action

@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router";
+import Headers from "../../components/common/Headers";
 
 const UserLockers = () => {
   const dispatch = useDispatch();
@@ -19,10 +20,11 @@ const UserLockers = () => {
   const handleBookLocker = (lockerId) => {
     // Implement your booking logic here
     console.log("Booking locker:", lockerId);
-    navigate(`user/lockers/${lockerId}`);
+    navigate(`${lockerId}`);
   };
   return (
     <Container>
+      <Headers />
       <h2>User Lockers</h2>
       <Row>
         {lockers.map((locker) => (
@@ -33,13 +35,24 @@ const UserLockers = () => {
                 <Card.Text>Dimension: {locker.dimension}</Card.Text>
                 <Card.Text>Capacity: {locker.capacity}</Card.Text>
                 <Card.Text>Status: {locker.status}</Card.Text>
-                <Button
-                  className="col-12"
-                  onClick={() => handleBookLocker(locker.lockerId)}
-                  variant="primary"
-                >
-                  Book
-                </Button>
+                {locker.status === "available" ? (
+                  <Button
+                    className="col-12"
+                    onClick={() => handleBookLocker(locker.lockerId)}
+                    variant="primary"
+                  >
+                    Book
+                  </Button>
+                ) : (
+                  <Button
+                    className="col-12"
+                    // onClick={() => handleBookLocker(locker.lockerId)}
+                    variant="primary"
+                    disabled
+                  >
+                    Reserved
+                  </Button>
+                )}
               </Card.Body>
             </Card>
           </Col>

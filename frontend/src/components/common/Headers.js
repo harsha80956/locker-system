@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../../actions/authActions";
@@ -6,6 +6,16 @@ import { logout } from "../../actions/authActions";
 const Headers = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isAdmin, setIsAdmin] = useState();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const data = localStorage.getItem("role");
+    if (data) {
+      setIsAuthenticated(true);
+      setIsAdmin(data);
+    }
+  }, []);
 
   const handleLogout = () => {
     // Dispatch the logout action
@@ -15,7 +25,7 @@ const Headers = () => {
     navigate("/login");
   };
 
-  return (
+  return isAuthenticated ? (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
         <Link className="navbar-brand" to="/admin/dashboard">
@@ -34,16 +44,27 @@ const Headers = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/admin/dashboard">
-                Dashboard
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/admin/create-locker">
-                Create Locker
-              </Link>
-            </li>
+            {isAdmin === "admin" && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/dashboard">
+                  Dashboard
+                </Link>
+              </li>
+            )}
+            {isAdmin === "admin" && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/create-locker">
+                  Create Lockers
+                </Link>
+              </li>
+            )}
+            {isAdmin === "user" && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/user/lockers">
+                  User Locker
+                </Link>
+              </li>
+            )}
             <li className="nav-item">
               <button className="btn btn-link nav-link" onClick={handleLogout}>
                 Logout
@@ -53,7 +74,8 @@ const Headers = () => {
         </div>
       </div>
     </nav>
+  ) : (
+    <span></span>
   );
 };
-
 export default Headers;
