@@ -19,7 +19,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Use routes
-app.use("/api/users", userRoutes);
+app.use("/api/auth", userRoutes);
 app.use("/api/lockers", lockerRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/dashboard", dashboardRoutes);

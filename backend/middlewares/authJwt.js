@@ -1,20 +1,34 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const config = require("config");
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
+  // Get the token from the request header
+  const token = req.header("Authorization");
 
+  // Check if the token is not provided
   if (!token) {
-    return res.status(403).send({ message: "No token provided!" });
+    return res.status(401).json({ msg: "No token provided!" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ message: "Unauthorized!" });
+  try {
+    // Check if the token starts with "Bearer "
+    if (!token.startsWith("Bearer ")) {
+      return res.status(401).json({ msg: "Invalid token format!" });
     }
-    req.userId = decoded.id;
+
+    // Remove the "Bearer " prefix from the token
+    const jwtToken = token.substring(7);
+
+    // Verify the token
+    const decoded = jwt.verify(jwtToken, config.get("jwtSecret"));
+
+    // Set the user ID from the token payload to the request object for further use
+    req.userId = decoded.userId;
     next();
-  });
+  } catch (err) {
+    res.status(401).json({ msg: "Invalid token!" });
+  }
 };
 
 isAdmin = async (req, res, next) => {
