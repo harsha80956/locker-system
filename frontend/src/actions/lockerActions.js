@@ -1,36 +1,74 @@
-import axios from "axios";
+import axiosInstance from "../api/axiosConfig";
+import {
+  GET_LOCKERS,
+  LOCKER_ERROR,
+  ADD_LOCKER,
+  DELETE_LOCKER,
+  UPDATE_LOCKER_STATUS,
+} from "../utils/types";
 
-// Action types
-export const FETCH_LOCKERS_SUCCESS = "FETCH_LOCKERS_SUCCESS";
-export const BOOK_LOCKER_SUCCESS = "BOOK_LOCKER_SUCCESS";
-
-// Action creators
-export const fetchLockersSuccess = (lockers) => ({
-  type: FETCH_LOCKERS_SUCCESS,
-  payload: lockers,
-});
-
-export const bookLockerSuccess = (lockerID) => ({
-  type: BOOK_LOCKER_SUCCESS,
-  payload: lockerID,
-});
-
-// Thunk to fetch lockers data
-export const fetchLockers = () => async (dispatch) => {
+// Get all lockers
+export const getLockers = () => async (dispatch) => {
   try {
-    const response = await axios.get("/lockers");
-    dispatch(fetchLockersSuccess(response.data));
-  } catch (error) {
-    console.error("Failed to fetch lockers:", error.message);
+    const response = await axiosInstance.get("/lockers");
+    dispatch({
+      type: GET_LOCKERS,
+      payload: response.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: LOCKER_ERROR,
+      payload: err.response.data.message,
+    });
   }
 };
 
-// Thunk to book a locker
-export const bookLocker = (lockerID) => async (dispatch) => {
+// Add a new locker
+export const addLocker = (lockerData) => async (dispatch) => {
   try {
-    const response = await axios.post(`/lockers/${lockerID}/book`);
-    dispatch(bookLockerSuccess(lockerID));
-  } catch (error) {
-    console.error(`Failed to book locker ${lockerID}:`, error.message);
+    const response = await axiosInstance.post("/lockers/add", lockerData);
+    dispatch({
+      type: ADD_LOCKER,
+      payload: response.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: LOCKER_ERROR,
+      payload: err.response.data.message,
+    });
+  }
+};
+
+// Update locker status
+export const updateLockerStatus = (lockerId, status) => async (dispatch) => {
+  try {
+    const response = await axiosInstance.patch(`/lockers/${lockerId}/update`, {
+      status,
+    });
+    dispatch({
+      type: UPDATE_LOCKER_STATUS,
+      payload: { lockerId, status: response.data.status },
+    });
+  } catch (err) {
+    dispatch({
+      type: LOCKER_ERROR,
+      payload: err.response.data.message,
+    });
+  }
+};
+
+// Delete a locker
+export const deleteLocker = (lockerId) => async (dispatch) => {
+  try {
+    await axiosInstance.delete(`/lockers/${lockerId}`);
+    dispatch({
+      type: DELETE_LOCKER,
+      payload: lockerId,
+    });
+  } catch (err) {
+    dispatch({
+      type: LOCKER_ERROR,
+      payload: err.response.data.message,
+    });
   }
 };

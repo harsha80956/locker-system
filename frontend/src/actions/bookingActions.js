@@ -1,45 +1,75 @@
-import axios from "axios";
+import axiosInstance from "../api/axiosConfig";
+import {
+  GET_BOOKINGS,
+  BOOKING_ERROR,
+  ADD_BOOKING,
+  DELETE_BOOKING,
+  UPDATE_BOOKING_STATUS,
+} from "../utils/types";
 
-export const makeBooking = (bookingData) => async (dispatch) => {
+// Get all bookings for a user
+export const getUserBookings = (userId) => async (dispatch) => {
   try {
-    // Get the JWT token from local storage
-    const token = localStorage.getItem("token");
-
-    // Set the token in the request headers
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    const response = await axios.post("/bookings", bookingData, config);
-    dispatch({ type: "BOOKING_SUCCESS", payload: response.data });
-    // You can add any additional logic or notifications here on successful booking
-  } catch (error) {
-    dispatch({ type: "BOOKING_FAILURE", payload: error.message });
-    // Handle any errors or display error messages here
+    const response = await axiosInstance.get(`/bookings/user/${userId}`);
+    dispatch({
+      type: GET_BOOKINGS,
+      payload: response.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: BOOKING_ERROR,
+      payload: err.response.data.message,
+    });
   }
 };
 
-// Action to fetch the booking list with JWT token
-export const fetchBookings = () => async (dispatch) => {
+// Add a new booking
+export const addBooking = (bookingData) => async (dispatch) => {
   try {
-    dispatch({ type: "FETCH_BOOKINGS_REQUEST" });
+    const response = await axiosInstance.post("/bookings/add", bookingData);
+    dispatch({
+      type: ADD_BOOKING,
+      payload: response.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: BOOKING_ERROR,
+      payload: err.response.data.message,
+    });
+  }
+};
 
-    // Get the JWT token from local storage
-    const token = localStorage.getItem("token");
+// Update booking status (for example: "active", "completed", "cancelled")
+export const updateBookingStatus = (bookingId, status) => async (dispatch) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/bookings/${bookingId}/update`,
+      { status }
+    );
+    dispatch({
+      type: UPDATE_BOOKING_STATUS,
+      payload: { bookingId, status: response.data.status },
+    });
+  } catch (err) {
+    dispatch({
+      type: BOOKING_ERROR,
+      payload: err.response.data.message,
+    });
+  }
+};
 
-    // Set the token in the request headers
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    // Replace 'api/bookings' with the actual backend API endpoint to fetch bookings
-    const response = await axios.get("/bookings", config);
-
-    dispatch({ type: "FETCH_BOOKINGS_SUCCESS", payload: response.data });
-  } catch (error) {
-    dispatch({ type: "FETCH_BOOKINGS_FAILURE", payload: error.message });
+// Delete a booking
+export const deleteBooking = (bookingId) => async (dispatch) => {
+  try {
+    await axiosInstance.delete(`/bookings/${bookingId}`);
+    dispatch({
+      type: DELETE_BOOKING,
+      payload: bookingId,
+    });
+  } catch (err) {
+    dispatch({
+      type: BOOKING_ERROR,
+      payload: err.response.data.message,
+    });
   }
 };

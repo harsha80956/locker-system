@@ -1,21 +1,59 @@
 import {
-  FETCH_LOCKERS_SUCCESS,
-  BOOK_LOCKER_SUCCESS,
-} from "../actions/lockerActions";
+  ADD_LOCKER,
+  GET_LOCKERS,
+  LOCKER_ERROR,
+  DELETE_LOCKER,
+  UPDATE_LOCKER_STATUS,
+} from "../utils/types";
 
-const initialState = [];
+const initialState = {
+  lockers: [],
+  loading: true,
+  error: null,
+};
 
 const lockerReducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_LOCKERS_SUCCESS:
-      return action.payload;
-    case BOOK_LOCKER_SUCCESS:
-      // Update the locker availability status in the state
-      return state.map((locker) =>
-        locker._id === action.payload
-          ? { ...locker, availabilityStatus: "booked" }
-          : locker
-      );
+    case GET_LOCKERS:
+      return {
+        ...state,
+        lockers: action.payload,
+        loading: false,
+        error: null,
+      };
+    case ADD_LOCKER:
+      return {
+        ...state,
+        lockers: [...state.lockers, action.payload],
+        loading: false,
+        error: null,
+      };
+    case DELETE_LOCKER:
+      return {
+        ...state,
+        lockers: state.lockers.filter(
+          (locker) => locker._id !== action.payload
+        ),
+        loading: false,
+        error: null,
+      };
+    case UPDATE_LOCKER_STATUS:
+      return {
+        ...state,
+        lockers: state.lockers.map((locker) =>
+          locker._id === action.payload.lockerId
+            ? { ...locker, status: action.payload.status }
+            : locker
+        ),
+        loading: false,
+        error: null,
+      };
+    case LOCKER_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
     default:
       return state;
   }

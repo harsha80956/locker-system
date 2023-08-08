@@ -1,40 +1,35 @@
 const initialState = {
   bookings: [],
+  currentBooking: null,
   loading: false,
   error: null,
 };
 
 const bookingReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "BOOKING_SUCCESS":
-      return {
-        ...state,
-        bookingData: action.payload,
-        error: null,
-      };
-    case "BOOKING_FAILURE":
-      return {
-        ...state,
-        bookingData: null,
-        error: action.payload,
-      };
-    case "FETCH_BOOKINGS_REQUEST":
+    case "BOOKINGS_LOADING":
       return {
         ...state,
         loading: true,
       };
-    case "FETCH_BOOKINGS_SUCCESS":
+    case "BOOKINGS_LOADED":
       return {
         ...state,
         bookings: action.payload,
         loading: false,
-        error: null,
       };
-    case "FETCH_BOOKINGS_FAILURE":
+    case "CREATE_BOOKING":
       return {
         ...state,
+        bookings: [...state.bookings, action.payload],
+        currentBooking: action.payload,
         loading: false,
+      };
+    case "BOOKING_ERROR":
+      return {
+        ...state,
         error: action.payload,
+        loading: false,
       };
     default:
       return state;
